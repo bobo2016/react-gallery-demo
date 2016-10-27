@@ -114,6 +114,16 @@ class AppComponent extends React.Component {
     		ImgFigures = [];
 
     		imageDatas.forEach((value, index) => {
+
+                if(!this.state.imgsArrangeArr[index]){
+                    this.stage.imgsArrangeArr[index] = {
+                        pos: {
+                            left: 0.
+                            top: 0
+                        }
+                    }
+                }
+
     			ImgFigures.push(<ImgFigure data={value} ref={'imgFigure' + index}/>);
     		})
 
