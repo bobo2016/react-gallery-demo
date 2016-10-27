@@ -113,7 +113,7 @@ class AppComponent extends React.Component {
     	let controllerUnits = [],
     		ImgFigures = [];
 
-    		imageDatas.forEach(function(value){
+    		imageDatas.forEach((value, index) => {
     			ImgFigures.push(<ImgFigure data={value} ref={'imgFigure' + index}/>);
     		})
 
