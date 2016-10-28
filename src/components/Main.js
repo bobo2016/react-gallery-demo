@@ -27,7 +27,7 @@ imageDatas = (function genImageURL(imageDatasArr) {
  *get range random number
  */
 
-function getRangeRandom(low, high){
+let getRangeRandom = (low, high) => {
     return Math.ceil( Math.random * (high - low) + low);
 }
 
@@ -61,7 +61,7 @@ class AppComponent extends React.Component {
      * @param centerIndex specify which image should be center positioned
      */
 
-    rearrange: function(centerIndex){
+    rearrange(centerIndex) {
         let imgsArrangeArr = this.state.imgsArrangeArr,
             Constant = AppComponent.constant,
             centerPos = AppComponent.Constant.centerPos,
@@ -71,7 +71,7 @@ class AppComponent extends React.Component {
             hPosRangeRightSecX = hPosRange.rightSecX,
             hPosRangeY = hPosRange.y,
             vPosRangeTopY = vPosRange.topY,
-            vPosRangeX = vPosRange.x，
+            vPosRangeX = vPosRange.x,
 
             imgsArrangeTopArr = [],
             topImgNum = Math.ceil(Math.random() * 2), //get one or none
@@ -123,23 +123,23 @@ class AppComponent extends React.Component {
             this.setState({
                 imgsArrangeArr: imgsArrangeArr
             })
-    },
+    };
 
-    getInitialState: function(){
+    getInitialState() {
         return {
             imgsArrangeArr: [
-                /*{
+                {
                     pos: {
                         left: '0',
                         top: '0'
                     }
-                }*/
+                }
             ]
         };
-    },
+    };
 
     // calculate each image position after the component mount
-    componentDidMount: function(){
+    componentDidMount() {
         //get stage size
         let stageDOM = this.refs.stage,
             stageW = stageDOM.scrollWidth,//object actual content width
@@ -191,7 +191,7 @@ class AppComponent extends React.Component {
                 if(!this.state.imgsArrangeArr[index]){
                     this.state.imgsArrangeArr[index] = {
                         pos: {
-                            left: 0.
+                            left: 0,
                             top: 0
                         }
                     };
