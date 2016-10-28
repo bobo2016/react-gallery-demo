@@ -23,13 +23,26 @@ imageDatas = (function genImageURL(imageDatasArr) {
 	return imageDatasArr;
 })(imageDatas);
 
+/*
+ *get range random number
+ */
 
+function getRangeRandom(low, high){
+    return Math.ceil( Math.random * (high - low) + low);
+}
 
 class ImgFigure extends React.Component{
 	render(){
 
+        let styleObj = {};
+
+        //if props specify the image position, then use
+        if(this.props.arrange.pos){
+            styleObj = this.props.arrange.pos;
+        }
+
 		return (
-			<figure className="img-figure">
+			<figure className="img-figure" style={styleObj}>
 				<img src={this.props.data.imageURL} alt={this.props.data.title}/>
 				<figcaption>
 					<h2 className="img-title">{this.props.data.title}</h2>
@@ -49,10 +62,70 @@ class AppComponent extends React.Component {
      */
 
     rearrange: function(centerIndex){
+        let imgsArrangeArr = this.state.imgsArrangeArr,
+            Constant = AppComponent.constant,
+            centerPos = AppComponent.Constant.centerPos,
+            hPosRange = AppComponent.Constant.hPosRange,
+            vPosRange = AppComponent.Constant.vPosRange,
+            hPosRangeLeftSecX = hPosRange.leftSecX,
+            hPosRangeRightSecX = hPosRange.rightSecX,
+            hPosRangeY = hPosRange.y,
+            vPosRangeTopY = vPosRange.topY,
+            vPosRangeX = vPosRange.x，
 
+            imgsArrangeTopArr = [],
+            topImgNum = Math.ceil(Math.random() * 2), //get one or none
+            topImgSpliceIndex = 0,
+
+            imgsArrangeCenterArr = imgsArrangeArr.splice(centerIndex,1);
+
+            //first center centerIndex image
+            imgsArrangeCenterArr[0].pos = centerPos;
+
+            //fetch top section image state info
+            topImgSpliceIndex = Math.ceil(Math.random() * (imgsArrangeArr.length - topImgNum));
+
+            imgsArrangeTopArr = imgsArrangeArr.splice(topImgSpliceIndex, topImgNum);
+
+
+            //arrange top section image
+            imgsArrangeTopArr.forEach((value,index) =>{
+                imgsArrangeTopArr[index].pos = {
+                    top: getRangeRandom (vPosRangeTopY[0],vPosRangeTopY[1]),
+                    left: getRangeRandom(vPosRangeX[0], vPosRangeX[1])
+                };
+            });
+
+            //arrange left and right side image
+            for(let i = 0, j = imgsArrangeArr.length, k = j / 2; i < j; i++){
+                let hPosRangeLORX = null;
+
+                //half front position left, half right position right 
+                if(i < k){
+                    hPosRangeLORX =  hPosRangeLeftSecX;
+
+                }else{
+                    hPosRangeLORX = hPosRangeRightSecX;
+                }
+
+                imgsArrangeArr[i].pos = {
+                    top: getRangeRandom(hPosRangeY[0],hPosRangeY[1]),
+                    left: getRangeRandom(hPosRangeLORX[0],hPosRangeLORX[1])
+                };
+            }
+
+            if(imgsArrangeTopArr && imgsArrangeTopArr[0]){
+                imgsArrangeArr.splice(topImgSpliceIndex, 0, imgsArrangeTopArr[0]);
+            }
+
+            imgsArrangeArr.splice(centerIndex, 0, imgsArrangeCenterArr[0]);
+
+            this.setState({
+                imgsArrangeArr: imgsArrangeArr
+            })
     },
 
-    getInitialStage: function(){
+    getInitialState: function(){
         return {
             imgsArrangeArr: [
                 /*{
@@ -86,14 +159,14 @@ class AppComponent extends React.Component {
         AppComponent.constant.centerPos = {
             left: halfStageW - halfImgW,
             top: halfStageH - halfImgH
-        }
+        };
 
         //calculate left and right image section position range
         AppComponent.constant.hPosRange.leftSecX[0] = -halfImgW;
         AppComponent.constant.hPosRange.leftSecX[1] = halfStageW - halfImgW * 3;
 
         AppComponent.constant.hPosRange.rightSecX[0] = halfStageW + halfImgW;
-        AppComponent.constant.hPosRange.rightSecX[0] = stageW - halfImgW;
+        AppComponent.constant.hPosRange.rightSecX[1] = stageW - halfImgW;
         AppComponent.constant.hPosRange.y[0] = -halfImgH;
         AppComponent.constant.hPosRange.y[1] = stageH - halfImgH;
 
@@ -104,7 +177,7 @@ class AppComponent extends React.Component {
         AppComponent.constant.vPosRange.x[0] = halfStageW - imgW;
         AppComponent.constant.vPosRange.x[1] = halfStageW;
 
-        this.rearrange(0);
+        //this.rearrange(0);
 
     }
 
@@ -116,15 +189,15 @@ class AppComponent extends React.Component {
     		imageDatas.forEach((value, index) => {
 
                 if(!this.state.imgsArrangeArr[index]){
-                    this.stage.imgsArrangeArr[index] = {
+                    this.state.imgsArrangeArr[index] = {
                         pos: {
                             left: 0.
                             top: 0
                         }
-                    }
+                    };
                 }
 
-    			ImgFigures.push(<ImgFigure data={value} ref={'imgFigure' + index}/>);
+    			ImgFigures.push(<ImgFigure data={value} ref={'imgFigure' + index} arrange={this.state.imgsArrangeArr[index]}/>);
     		})
 
 
