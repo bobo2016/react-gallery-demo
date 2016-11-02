@@ -2,6 +2,7 @@ require('normalize.css/normalize.css');
 require('styles/App.scss');
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 //Get image related data
 let imageDatas = require('../data/imageDatas.json');
@@ -11,7 +12,7 @@ let imageDatas = require('../data/imageDatas.json');
 
 // Get image Url from imageDatas.json filename
 //Use self-invoke function for function only execute once
-imageDatas = (function genImageURL(imageDatasArr) {
+imageDatas = ((imageDatasArr) => {
 	for(var i = 0, j = imageDatasArr.length; i < j; i++){
 		var singleImageData = imageDatasArr[i];
 
@@ -27,9 +28,7 @@ imageDatas = (function genImageURL(imageDatasArr) {
  *get range random number
  */
 
-let getRangeRandom = (low, high) => {
-    return Math.ceil( Math.random * (high - low) + low);
-}
+let getRangeRandom = (low, high) => Math.ceil( Math.random() * (high - low) + low);
 
 class ImgFigure extends React.Component{
 	render(){
@@ -61,12 +60,42 @@ class AppComponent extends React.Component {
      * @param centerIndex specify which image should be center positioned
      */
 
+    constructor(props){
+        super(props);
+        this.Constant = {
+            centerPos:{
+                left: 0,
+                right: 0
+            },
+            hPosRange: { //horizontal range
+                leftSecX: [0, 0],
+                rightSecX: [0, 0],
+                y:[0, 0]
+            },
+            vPosRange: { //vertical range
+                x: [0, 0],
+                topY: [0, 0]
+            }
+        };
+
+        this.state = {
+            imgsArrangeArr: [
+               /* {
+                    pos: {
+                        left: '0',
+                        top: '0'
+                    }
+                }*/
+            ]
+        }
+    }
+
     rearrange(centerIndex) {
         let imgsArrangeArr = this.state.imgsArrangeArr,
-            Constant = AppComponent.constant,
-            centerPos = AppComponent.Constant.centerPos,
-            hPosRange = AppComponent.Constant.hPosRange,
-            vPosRange = AppComponent.Constant.vPosRange,
+            Constant = this.Constant,
+            centerPos = Constant.centerPos,
+            hPosRange = Constant.hPosRange,
+            vPosRange = Constant.vPosRange,
             hPosRangeLeftSecX = hPosRange.leftSecX,
             hPosRangeRightSecX = hPosRange.rightSecX,
             hPosRangeY = hPosRange.y,
@@ -79,19 +108,30 @@ class AppComponent extends React.Component {
 
             imgsArrangeCenterArr = imgsArrangeArr.splice(centerIndex,1);
 
+
             //first center centerIndex image
             imgsArrangeCenterArr[0].pos = centerPos;
 
             //fetch top section image state info
             topImgSpliceIndex = Math.ceil(Math.random() * (imgsArrangeArr.length - topImgNum));
 
+            console.log(topImgSpliceIndex);
             imgsArrangeTopArr = imgsArrangeArr.splice(topImgSpliceIndex, topImgNum);
+
+            console.log(imgsArrangeTopArr);
+            console.log(imgsArrangeTopArr);
+            console.log(vPosRangeX[0]);
+            console.log(vPosRangeX[1]);
+            console.log(getRangeRandom);
+            let testTop = getRangeRandom(640, 960);
+            console.log(testTop);
+            
 
 
             //arrange top section image
             imgsArrangeTopArr.forEach((value,index) =>{
                 imgsArrangeTopArr[index].pos = {
-                    top: getRangeRandom (vPosRangeTopY[0],vPosRangeTopY[1]),
+                    top: getRangeRandom(vPosRangeTopY[0],vPosRangeTopY[1]),
                     left: getRangeRandom(vPosRangeX[0], vPosRangeX[1])
                 };
             });
@@ -100,7 +140,8 @@ class AppComponent extends React.Component {
             for(let i = 0, j = imgsArrangeArr.length, k = j / 2; i < j; i++){
                 let hPosRangeLORX = null;
 
-                //half front position left, half right position right 
+                //half front position left, half right position right
+
                 if(i < k){
                     hPosRangeLORX =  hPosRangeLeftSecX;
 
@@ -123,20 +164,7 @@ class AppComponent extends React.Component {
             this.setState({
                 imgsArrangeArr: imgsArrangeArr
             })
-    };
-
-    getInitialState() {
-        return {
-            imgsArrangeArr: [
-                {
-                    pos: {
-                        left: '0',
-                        top: '0'
-                    }
-                }
-            ]
-        };
-    };
+    }
 
     // calculate each image position after the component mount
     componentDidMount() {
@@ -144,11 +172,12 @@ class AppComponent extends React.Component {
         let stageDOM = this.refs.stage,
             stageW = stageDOM.scrollWidth,//object actual content width
             stageH = stageDOM.scrollHeight,
+
             halfStageW = Math.ceil(stageW / 2),
             halfStageH = Math.ceil(stageH / 2);
 
         //get one image figure size
-        let imgFigureDOM = this.refs.imgFigure0,
+        let imgFigureDOM = ReactDOM.findDOMNode(this.refs.imgFigure0),
             imgW = imgFigureDOM.scrollWidth,
             imgH = imgFigureDOM.scrollHeight,
             halfImgW = Math.ceil(imgW / 2),
@@ -156,28 +185,33 @@ class AppComponent extends React.Component {
 
 
         //calculate center image position
-        AppComponent.constant.centerPos = {
+        this.Constant.centerPos = {
             left: halfStageW - halfImgW,
             top: halfStageH - halfImgH
         };
 
-        //calculate left and right image section position range
-        AppComponent.constant.hPosRange.leftSecX[0] = -halfImgW;
-        AppComponent.constant.hPosRange.leftSecX[1] = halfStageW - halfImgW * 3;
 
-        AppComponent.constant.hPosRange.rightSecX[0] = halfStageW + halfImgW;
-        AppComponent.constant.hPosRange.rightSecX[1] = stageW - halfImgW;
-        AppComponent.constant.hPosRange.y[0] = -halfImgH;
-        AppComponent.constant.hPosRange.y[1] = stageH - halfImgH;
+        //calculate left and right image section position range
+        this.Constant.hPosRange.leftSecX[0] = -halfImgW;
+        this.Constant.hPosRange.leftSecX[1] = halfStageW - halfImgW * 3;
+
+        this.Constant.hPosRange.rightSecX[0] = halfStageW + halfImgW;
+        this.Constant.hPosRange.rightSecX[1] = stageW - halfImgW;
+        this.Constant.hPosRange.y[0] = -halfImgH;
+        this.Constant.hPosRange.y[1] = stageH - halfImgH;
 
 
         //calculate top image section position range
-        AppComponent.constant.vPosRange.topY[0] = -halfImgH
-        AppComponent.constant.vPosRange.topY[1] = halfstageH - halfImgH * 3;
-        AppComponent.constant.vPosRange.x[0] = halfStageW - imgW;
-        AppComponent.constant.vPosRange.x[1] = halfStageW;
+        this.Constant.vPosRange.topY[0] = -halfImgH
+        this.Constant.vPosRange.topY[1] = halfStageH - halfImgH * 3;
 
-        //this.rearrange(0);
+        this.Constant.vPosRange.x[0] = halfStageW - imgW;
+        this.Constant.vPosRange.x[1] = halfStageW;
+
+
+
+        let num = Math.floor(Math.random() * 10);
+        this.rearrange(num);
 
     }
 
@@ -211,24 +245,10 @@ class AppComponent extends React.Component {
         		</nav>
         	</section>
         );
-
     }
 }
 
-AppComponent.constant = {
-    centerPos:{
-        left: 0,
-        right: 0
-    },
-    hPosRange: { //horizontal range
-        leftSecX: [0, 0],
-        rightSecX: [0, 0],
-        y:[0, 0]
-    },
-    vPosRange: { //vertical range
-        x: [0, 0],
-        topY: [0, 0]
-    }
-};
+AppComponent.propTypes = {};
+AppComponent.defaultProps = {};
 
 export default AppComponent;
