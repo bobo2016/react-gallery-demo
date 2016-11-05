@@ -98,6 +98,29 @@ class ImgFigure extends React.Component{
 }
 
 
+
+//control unit
+class ControllerUnit extends React.Component{
+    constructor(props){
+        super(props);
+    }
+
+    handleClick(e) {
+
+
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    render() {
+        return (
+            <span className="controller-unit" onClick={this.handleClick}></span>
+        );
+    }
+
+}
+
+
 //AppComponent manage all the data and state | manager pattern
 class AppComponent extends React.Component {
     
@@ -304,7 +327,7 @@ class AppComponent extends React.Component {
 
     render() {
 
-    	let controllerUnits = [],
+    	let ControllerUnits = [],
     		ImgFigures = [];
 
     		imageDatas.forEach((value, index) => {
@@ -322,7 +345,8 @@ class AppComponent extends React.Component {
                 }
 
     			ImgFigures.push(<ImgFigure data={value} ref={'imgFigure' + index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
-    		})
+    		    ControllerUnits.push(<ControllerUnit/>)
+            })
 
 
         return (
@@ -331,7 +355,7 @@ class AppComponent extends React.Component {
         			{ImgFigures}
         		</section>
         		<nav className="controller-nav">
-        			{controllerUnits}
+        			{ControllerUnits}
         		</nav>
         	</section>
         );
