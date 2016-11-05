@@ -38,6 +38,11 @@ let get30DegRandom = () => ((Math.random() > 0.5 ? '' : '-' )  + Math.ceil(Math.
  
 
 class ImgFigure extends React.Component{
+
+    constructor(props) {
+        super(props);
+        this.handleClick = this.handleClick.bind(this);
+    }
     /*
      * imgFigure handle click funciton
     */
@@ -48,7 +53,6 @@ class ImgFigure extends React.Component{
             this.props.center();
         }
 
-        this.props.inverse();
         e.stopPropagation();
         e.preventDefault();
     }
@@ -75,6 +79,7 @@ class ImgFigure extends React.Component{
 
         let imgFigureClassName = 'img-figure';
             imgFigureClassName += this.props.arrange.isInverse ? ' is-inverse' : '';
+
 
 		return (
 			<figure className={imgFigureClassName} style={styleObj} onClick={this.handleClick}>
@@ -159,7 +164,7 @@ class AppComponent extends React.Component {
             this.rearrange(index);
         };
     }
-    
+
     //rearrange
     /*
      * rearrange all the images
