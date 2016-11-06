@@ -68,8 +68,8 @@ class ImgFigure extends React.Component{
 
         //if images rotate degree has value and not equal to 0, add rotate degree
         if(this.props.arrange.rotate){
-            (['Moz','ms','Webkit','']).forEach((value) =>{
-                 styleObj[value + 'Transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
+            (['MozTransform','msTransform','WebkitTransform','transform']).forEach((value) =>{
+                 styleObj[value] = 'rotate(' + this.props.arrange.rotate + 'deg)';
             });         
         }
 
@@ -103,18 +103,42 @@ class ImgFigure extends React.Component{
 class ControllerUnit extends React.Component{
     constructor(props){
         super(props);
+
+        //if missed, would casue can not read props of null error
+        this.handleClick = this.handleClick.bind(this);
     }
 
     handleClick(e) {
 
+
+        //if click button on state, then rotate image, otherwise center the image
+
+        console.log(this.props.arrange.isCenter);
+        if(this.props.arrange.isCenter){
+            this.props.inverse();
+        } else {
+            this.props.center();
+        }
 
         e.stopPropagation();
         e.preventDefault();
     }
 
     render() {
+        let controllerUnitClassName = 'controller-unit';
+
+        //show button center state if center image
+        if(this.props.arrange.isCenter){
+            controllerUnitClassName += ' is-center';
+
+            //show controller button if rotate image
+            if(this.props.arrange.isInverse){
+                controllerUnitClassName += ' is-inverse';
+            }
+        }
+
         return (
-            <span className="controller-unit" onClick={this.handleClick}></span>
+            <span className={controllerUnitClassName} onClick={this.handleClick}></span>
         );
     }
 
@@ -207,7 +231,7 @@ class AppComponent extends React.Component {
             vPosRangeX = vPosRange.x,
 
             imgsArrangeTopArr = [],
-            topImgNum = Math.ceil(Math.random() * 2), //get one or none
+            topImgNum = Math.floor(Math.random() * 2), //get one or none
             topImgSpliceIndex = 0,
 
             imgsArrangeCenterArr = imgsArrangeArr.splice(centerIndex,1);
@@ -345,7 +369,7 @@ class AppComponent extends React.Component {
                 }
 
     			ImgFigures.push(<ImgFigure data={value} ref={'imgFigure' + index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
-    		    ControllerUnits.push(<ControllerUnit/>)
+    		    ControllerUnits.push(<ControllerUnit arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>)
             })
 
 
